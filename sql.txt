@@ -1,0 +1,286 @@
+CREATE DATABASE hack_santos;
+drop table if exists tb_usuario;
+
+CREATE TABLE tb_usuario(
+cd_usuario int not null primary key AUTO_INCREMENT,
+nm_usuario varchar(50) not null,
+nm_login varchar(50) not null,
+nm_senha varchar(50) not null,
+nm_email varchar(100) not null UNIQUE KEY
+);
+INSERT INTO tb_usuario VALUES(DEFAULT,'Rodrigo Garcia Topan Moreira','topan','123','rodrigo.topan@hotmail.com');
+
+select * from tb_usuario;
+/*UM USUARIO APONTA DIVERSOS INTERESSES*/
+CREATE TABLE tb_categoria(
+cd_categoria int(11) not null primary key AUTO_INCREMENT,
+nm_categoria varchar(50) not null,
+ds_categoria text,
+cd_usuario_categoria int,
+CONSTRAINT fk_usuario_categoria FOREIGN KEY (cd_usuario_categoria) REFERENCES tb_usuario(cd_usuario)
+);
+
+INSERT INTO tb_categoria values(DEFAULT,'Saúde','Projeto de vereadores e aprovações de prefeitos relacionado a saúde',1);
+
+
+/**/
+DROP TABLE IF EXISTS tb_vereador;
+CREATE TABLE tb_vereador(
+cd_vereador int not null primary key AUTO_INCREMENT,
+nm_vereador varchar(50) not null,
+cd_rg int(11) not null,
+cd_cpf int(11) not null,
+nm_email varchar(100) not null unique key,
+/*ESTÁ ELEITO?*/
+ds_status varchar(3) not null,
+ds_plano_governo text,
+ds_plano_acao text
+);
+INSERT INTO tb_vereador values(DEFAULT,'Bruno Luiz Anjos Soares da Silva',
+535321297,
+488311498,
+'bruno._luis@hotmail.com',
+'sim',
+'Meu plano de governo é estruturado em cima de 3 pilares de valores fundamentais, saúde,educação,segurança',
+'Investir na reforma de escolas municipais, no aumento do efetivo policial');
+SELECT * FROM tb_vereador;
+
+/*RELACIONA COM VEREADOR*/
+CREATE TABLE tb_projeto(
+cd_projeto int(11) not null primary key AUTO_INCREMENT,
+nm_projeto varchar(50) not null,
+ds_projeto text not null,
+cd_vereador_projeto int,
+CONSTRAINT fk_vereador_projeto FOREIGN KEY (cd_vereador_projeto) REFERENCES tb_vereador(cd_vereador)
+);
+
+INSERT INTO tb_projeto VALUES (DEFAULT,'[0001] Repintura das lombadas. Caminho São Jorge','através deste, comunico a comunidade sobre o meu engajamento e pressão realizada ao Executivo para pintura das lombadas no Caminho São Jorge, bairro da Caneleira.',1);
+
+
+/*RELACIONA COM SOLUCAO, USUARIO*/
+CREATE TABLE tb_problema(
+cd_problema int(11) not null primary key AUTO_INCREMENT,
+nm_titulo varchar(50) not null,
+dt_cadastro_problema date not null,
+cd_categoria_problema int,
+CONSTRAINT fk_categoria_problema FOREIGN KEY (cd_categoria_problema) REFERENCES tb_categoria(cd_categoria)
+);
+
+ALTER TABLE tb_problema ADD COLUMN ds_problema text;
+
+DESC tb_problema;
+
+INSERT INTO tb_problema values(DEFAULT, '[0001] Falta de pintura nas lombadas', CURRENT_DATE(), 1, 'Apresento aqui minha indignação contra a falta de pintura nas lombadas do Caminho São Jorge. A noite, não consegui enxergar a lombada e tive prejuízo no carro que bateu em seco na lombada.');
+select * from tb_problema;
+
+/*UM USUARIO REALIZA DIVERSAS PESQUISAS QUE SÃO ARMAZENADAS NO HISTÓRICO*/
+CREATE TABLE tb_historico(
+cd_busca int(11) not null primary key AUTO_INCREMENT,
+nm_busca varchar(100) not null,
+cd_usuario_historico int,
+CONSTRAINT fk_usuario_historico FOREIGN KEY (cd_usuario_historico) REFERENCES tb_usuario(cd_usuario)
+);
+
+select * from tb_historico;
+INSERT INTO tb_historico VALUES (DEFAULT,'001',1);
+
+CREATE TABLE tb_aprovada(
+cd_aprovada int not null primary key AUTO_INCREMENT,
+cd_projeto_aprovada int,
+CONSTRAINT fk_projeto_aprovada FOREIGN KEY (cd_projeto_aprovada) REFERENCES tb_projeto(cd_projeto)
+);
+desc tb_aprovada;
+INSERT INTO tb_aprovada VALUES(DEFAULT,1);
+
+CREATE TABLE tb_prefeito(
+cd_prefeito int not null primary key AUTO_INCREMENT,
+nm_prefeito varchar(50) not null,
+cd_rg int(11) not null,
+cd_cpf int(11) not null,
+nm_email varchar(100) not null,
+/*APROVA PROPOSTAS VEREADOR*/
+cd_solucao_aprovada_p int,
+CONSTRAINT fk_solucao_aprovada_p FOREIGN KEY (cd_solucao_aprovada_p) REFERENCES tb_aprovada(cd_aprovada)
+);
+
+select distinct * from tb_problema as prob, tb_categoria as c, tb_vereador as v, tb_solucao as s, tb_relevancia as r, tb_projeto as p, tb_historico as h, tb_prefeito as pre, tb_aprovada as a;
+select distinct * from tb_problema as prob, tb_categoria as c, tb_vereador as v, tb_solucao as s, tb_relevancia as r, tb_projeto as p, tb_historico as h, tb_prefeito as pre, tb_aprovada as a where v.cd_vereador = p.cd_vereador_projeto;
+select * from tb_projeto;
+select * from tb_prefeito;
+INSERT INTO TB_PREFEITO VALUES (DEFAULT,'Robson Perico Cardoso',294069093,647376448,'robih@gmail.com',1);
+
+/*UM CIDADE POSSUI MUITOS VEREADORES E UM PREFEITO*/
+/*CREATE TABLE tb_cidade(
+cd_cidade int not null primary key AUTO_INCREMENT,
+nm_cidade varchar(50) not null,
+cd_vereador_cidade int,
+cd_prefeito_cidade int,
+CONSTRAINT fk_vereador_cidade FOREIGN KEY (cd_vereador_cidade) REFERENCES tb_vereador(cd_vereador),
+CONSTRAINT fk_prefeito_cidade FOREIGN KEY (cd_prefeito_cidade) REFERENCES tb_prefeito(cd_prefeito)
+);*/
+
+/*INSERT INTO TB_CIDADE VALUES
+(DEFAULT,'Santos',1,1);
+SELECT * FROM TB_CIDADE;
+SELECT * FROM TB_PROBLEMA;
+*/
+/*RELACIONA COM TB_PROBLEMA, BAIRRO, VERADOR. TABELA DE RESOLUCAO*/
+/*UMA CIDADE POSSUI MUITAS CIDADES*/
+CREATE TABLE tb_bairro(
+cd_bairro int not null primary key AUTO_INCREMENT,
+nm_bairro varchar(50) not null,
+/*cd_cidade_bairro int,*/
+cd_usuario_bairro int,
+cd_problema_bairro int,
+cd_prefeito_bairro int,
+cd_vereador_bairro int,
+CONSTRAINT fk_usuario_bairro FOREIGN KEY (cd_usuario_bairro) REFERENCES tb_usuario(cd_usuario),
+CONSTRAINT fk_problema_bairro FOREIGN KEY (cd_problema_bairro) REFERENCES tb_problema(cd_problema),
+CONSTRAINT fk_prefeito_bairro FOREIGN KEY (cd_prefeito_bairro) REFERENCES tb_prefeito(cd_prefeito),
+CONSTRAINT fk_vereador_bairro FOREIGN KEY (cd_vereador_bairro) REFERENCES tb_vereador(cd_vereador)
+);
+
+select * from tb_cidade;
+select * from tb_problema;
+INSERT INTO tb_bairro VALUES(DEFAULT,'Centro',1,1,1,1);
+
+CREATE TABLE tb_solucao(
+cd_solucao int(11) not null primary key AUTO_INCREMENT,
+nm_solucao varchar(50) not null,
+dt_cadastro_solucao date,
+ds_plano_acao text,
+cd_problema_solucao int,
+cd_bairro_solucao int,
+cd_vereador_solucao int,
+CONSTRAINT fk_problema_solucao FOREIGN KEY (cd_problema_solucao) REFERENCES tb_problema(cd_problema),
+CONSTRAINT fk_bairro_solucao FOREIGN KEY (cd_bairro_solucao) REFERENCES tb_bairro(cd_bairro),
+CONSTRAINT fk_vereador_solucao FOREIGN KEY (cd_vereador_solucao) REFERENCES tb_vereador(cd_vereador)
+);
+/*PROSPOSTA AO PROBLEMA 001 ESCRITA PELO VEREADOR BRUNO LUIS, NO BAIRRO CENTRO DE SANTOS*/
+
+INSERT INTO tb_solucao VALUES(DEFAULT, '[001] Indicação ao prefeito', current_date(), 'Através deste, me prontifico a levar uma mensagem ao prefeito[executivo] indicando proposta de pintura das lombadas', 1, 1, 1);
+
+
+DESC TB_SOLUCAO;
+SELECT * FROM TB_BAIRRO;
+SELECT * FROM TB_VEREADOR;
+SELECT * FROM TB_PROBLEMA;
+/*RELACIONA COM SOLUÇÃO E USUARIO. TABELA RESOLUCAO*/
+
+select * from tb_solucao;
+
+CREATE TABLE tb_relevancia(
+cd_relevancia int not null primary key auto_increment,
+nr_importancia int(1) not null,/*O VALOR DE TODAS AS NOTAS CADASTRADAS. UTILIZADO PARA CALCULO DE FEEDBACK ATRAVÉS DE MÉDIA E PERCENTAGEM*/
+cd_solucao_relevancia int,
+cd_usuario_relevancia int,
+CONSTRAINT fk_solucao_relevancia FOREIGN KEY (cd_solucao_relevancia) REFERENCES tb_solucao(cd_solucao),
+CONSTRAINT fk_usuario_relevancia FOREIGN KEY (cd_usuario_relevancia) REFERENCES tb_usuario(cd_usuario)
+);
+
+select * from tb_usuario;
+SELECT * FROM TB_SOLUCAO;
+select * from tb_problema;
+select * from tb_categoria;
+
+select p.nm_titulo, p.dt_cadastro_problema, p.ds_problema, c.nm_categoria, b.nm_bairro from tb_problema as p inner join tb_categoria as c on (p.cd_categoria_problema = c.cd_categoria)
+inner join tb_bairro as b on (p.cd_problema = b.cd_problema_bairro);
+
+
+select * from tb_solucao;
+select * from tb_bairro;
+select * from tb_projeto;
+
+select s.nm_projeto, s.dt_cadastro_solucao, s.ds_plano_acao, p.nm_titulo, b.nm_bairro from tb_solucao as s inner join tb_bairro as b on (s.cd_bairro_solucao = b.cd_bairro)
+INNER JOIN tb_problema as p on s.cd_problema_solucao = p.cd_problema;
+
+
+/*PROBLEMA, SOLUÇÃO, PROJET, BAIRRO */
+select s.nm_titulo from tb_projeto;
+
+
+INSERT INTO TB_RELEVANCIA VALUES(DEFAULT, 10, 4, 1);
+
+select * from tb_bairro;
+
+select * from tb_problema;
+select * from tb_categoria;
+
+c.cd_categoria, c.nm_categoria, c.ds_categoria,
+u.cd_usuario, u.nm_usuario,
+v.cd_vereador, v.nm_vereador, v.cd_rg, v.cd_cpg, v.nm_email, v.ds_status, v.ds_plano_governo, v.ds_plano_acao,
+s.cd_solucao, s.nm_solucao, s.dt_cadastro_solucao,
+
+;
+
+select * from tb_problema as prob, tb_categoria as c, tb_vereador as v, tb_solucao as s, tb_relevancia as r, tb_projeto as p, tb_historico as h, tb_prefeito as pre, tb_aprovada as a where prob.cd_categoria_problema=c.cd_categoria;
+
+select * from tb_projeto;
+
+select * from tb_prefeito;
+
+select * from tb_vereador;
+
+select * from tb_problema as prob, tb_categoria as c, tb_vereador as v, tb_solucao as s, tb_relevancia as r, tb_projeto as p, tb_historico as h, tb_prefeito as pre, tb_aprovada as a where v.cd_vereador = p.cd_vereador_projeto;
+
+SELECT * from tb_solucao;
+
+drop table curti;
+select * from tb_problema;
+create table curti(
+cd_curti int not null primary key auto_increment,
+cd_problema int,
+constraint fk_problema foreign key (cd_problema) references tb_problema(cd_problema)
+);
+drop table n_curti;
+
+create table n_curti(
+cd_nao_curti int not null primary key auto_increment,
+cd_problema int,
+constraint fk_problema_n_curti foreign key (cd_problema) references tb_problema(cd_problema)
+);
+
+select * from n_curti;
+desc n_curti;
+select * from curti;
+insert into curti values(default,1);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT * FROM TB_USUARIO;
+
+SELECT * FROM TB_PROBLEMA;
+
+SELECT * FROM TB_RELEVANCIA;
+
+SELECT * FROM TB_HISTORICO;
+
+SELECT * FROM TB_VEREADOR;
+
+SELECT * FROM TB_SOLUCAO;
+
+SELECT * FROM TB_PROJETO;
+
+SELECT * FROM TB_PREFEITO;
+
+SELECT * FROM TB_APROVADA;
+
+select p.cd_projeto, p.nm_projeto, v.nm_vereador
+from tb_projeto as p inner join tb_vereador as v on p.cd_vereador_projeto = v.cd_vereador;
+
+desc tb_relevancia;
+select * from tb_categoria;
