@@ -1,8 +1,3 @@
-<H1>Hack In Santos</H1>
-Maratona de programação Hack in Santos realizada em Santos no dia 2 e 3 de dezembro.
-Uma das maiores experiências profissionais que tive a chance de receber de pessoas entusiastas, com muita experiência, visão de negócio, foco na entrega e em soluções. 
-Me apaixonei pelo ambiente envolvente e cheio de desafios que focam em contribuir para a sociedade. Hackathon contra corrupção!
-<hr>
 <h1>Consciência Pública</h1>
 O Consciência pública é a nossa solução contra a corrupção no país. A nossa solução busca o maior engajamento da população na politica e visa a maior transparência de informações públicas para que 
 qualquer pessoa consiga entender e acompanhar as atividades de seus representantes com facilidade.
